@@ -1,6 +1,40 @@
-import axiosOriginal from 'axios'
+import { addUrlQueries, replaceUrlPaths } from '@/helpers/urlHelper'
+import { OpenApiPath, OpenApiMethod, Response, ParameterProperties, PathParameter, QueryParameter, RequestBodyProperties } from '@/types/openapi/extractor'
+import Axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 
-export const axios = axiosOriginal.create({
-  baseURL: 'http://localhost',
-  withCredentials: true,
-})
+type CustomAxiosRequestConfig<
+  Path extends OpenApiPath,
+  Method extends OpenApiMethod<Path>,
+> = Omit<AxiosRequestConfig, 'data'> & {
+  url: Path
+  method: Method
+} & RequestBodyProperties<Path, Method> &
+  ParameterProperties<Path, Method, PathParameter<Path, Method>, 'path'> &
+  ParameterProperties<Path, Method, QueryParameter<Path, Method>, 'query'>
+
+class axios {
+  private axiosInstance: AxiosInstance
+
+  constructor() {
+    this.axiosInstance = Axios.create()
+  }
+
+  async openapi<Path extends OpenApiPath, Method extends OpenApiMethod<Path>>(
+    config: CustomAxiosRequestConfig<Path, Method>,
+  ): Promise<AxiosResponse<Response<Path, Method>>> {
+    const { url, path, query, ...baseConfig } = config
+
+    const requestConfig = {
+      ...baseConfig,
+      url: addUrlQueries(replaceUrlPaths(url, path), query),
+    }
+
+    return await this.axiosInstance.request<
+      Response<Path, Method>,
+      AxiosResponse<Response<Path, Method>>,
+      CustomAxiosRequestConfig<Path, Method>['data']
+    >(requestConfig)
+  }
+}
+
+export default new axios()
