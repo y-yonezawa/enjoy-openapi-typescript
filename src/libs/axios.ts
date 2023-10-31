@@ -19,7 +19,7 @@ class axios {
     this.axiosInstance = Axios.create()
   }
 
-  async openapi<Path extends OpenApiPath, Method extends OpenApiMethod<Path>>(
+  openapi<Path extends OpenApiPath, Method extends OpenApiMethod<Path>>(
     config: CustomAxiosRequestConfig<Path, Method>,
   ): Promise<AxiosResponse<Response<Path, Method>>> {
     const { url, path, query, ...baseConfig } = config
@@ -29,7 +29,7 @@ class axios {
       url: addUrlQueries(replaceUrlPaths(url, path), query),
     }
 
-    return await this.axiosInstance.request<
+    return this.axiosInstance.request<
       Response<Path, Method>,
       AxiosResponse<Response<Path, Method>>,
       CustomAxiosRequestConfig<Path, Method>['data']
