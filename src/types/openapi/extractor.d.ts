@@ -9,7 +9,9 @@ export type Response<
   Status extends
     keyof paths[Path][Method]['responses'] = 200 extends keyof paths[Path][Method]['responses']
     ? 200
-    : 201,
+    : 201 extends keyof paths[Path][Method]['responses']
+    ? 201
+    : 'default',
 > = paths[Path][Method]['responses'][Status]['content']['application/json']
 
 export type RequestBody<
