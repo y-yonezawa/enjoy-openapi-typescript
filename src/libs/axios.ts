@@ -1,5 +1,5 @@
 import { addUrlQueries, replaceUrlPaths } from '@/helpers/urlHelper'
-import { OpenApiPath, OpenApiMethod, Response, ParameterProperties, PathParameter, QueryParameter, RequestBodyProperties } from '@/types/openapi/extractor'
+import { OpenApiPath, OpenApiMethod, Response, ParameterProperty, PathParameter, QueryParameter, RequestBody } from '@/types/openapi/extractor'
 import Axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 
 type CustomAxiosRequestConfig<
@@ -8,9 +8,9 @@ type CustomAxiosRequestConfig<
 > = Omit<AxiosRequestConfig, 'data'> & {
   url: Path
   method: Method
-} & RequestBodyProperties<Path, Method> &
-  ParameterProperties<Path, Method, PathParameter<Path, Method>, 'path'> &
-  ParameterProperties<Path, Method, QueryParameter<Path, Method>, 'query'>
+} & RequestBody<Path, Method> &
+  ParameterProperty<Path, Method, PathParameter<Path, Method>, 'path'> &
+  ParameterProperty<Path, Method, QueryParameter<Path, Method>, 'query'>
 
 class axios {
   private axiosInstance: AxiosInstance
